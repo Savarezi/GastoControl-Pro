@@ -10,6 +10,7 @@ import { Category, Expense, FixedExpense, CATEGORIES } from './types';
 import { cn, formatCurrency } from './utils';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import '../index.css'; // Isso avisa ao App.tsx para buscar as cores na raiz
 
 // --- Componentes de UI ---
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (

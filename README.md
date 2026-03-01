@@ -4,6 +4,9 @@ O **GastoControl-Pro** é uma aplicação moderna de gestão financeira pessoal,
 
 ---
 
+<img width="915" height="440" alt="image" src="https://github.com/user-attachments/assets/408cd91d-c1ec-4e03-8708-66a1caff2848" />
+
+
 ## 🚀 Funcionalidades
 
 - **Dashboard Inteligente**  

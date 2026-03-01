@@ -106,3 +106,32 @@ Sem isso o OAuth quebra. E não é bug — é configuração mesmo 😅
 | 📄 [.gitignore](./.gitignore) | Arquivos e pastas ignorados pelo Git |
 | 📄 [LICENSE](./LICENSE) | Licença do projeto |
 | 📄 [metadata.json](./metadata.json) | Metadados da aplicação |
+
+
+####
+
+
+---
+
+## 🏗️ Arquitetura Técnica
+
+O **GastoControl-Pro** segue uma arquitetura baseada em separação de responsabilidades:
+
+- **UI (Interface)** → Componentes React responsáveis pela renderização e interação.
+- **Camada de Serviço** → Integração com Supabase (autenticação e banco de dados).
+- **Persistência** → Dados armazenados e gerenciados via Supabase.
+- **Build & Deploy** → Vite para build otimizada e Vercel para deploy contínuo.
+
+Fluxo simplificado:
+
+Usuário → Interface React → Serviços (Supabase) → Banco de Dados → Atualização em tempo real na UI
+
+---
+
+## 🌐 Deploy
+
+A aplicação pode ser publicada facilmente na Vercel.
+
+```bash
+npm install
+npm run build

@@ -10,9 +10,8 @@ import { Category, Expense, FixedExpense, CATEGORIES } from './types';
 import { cn, formatCurrency } from './utils';
 import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
-import '../index.css'; // Isso avisa ao App.tsx para buscar as cores na raiz
+import '../index.css';
 
-// --- Componentes de UI ---
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
   <div className={cn("bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden", className)}>{children}</div>
 );
@@ -86,9 +85,7 @@ export default function App() {
 
   useEffect(() => { fetchData(); }, [session, selectedMonth]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  const handleLogout = async () => { await supabase.auth.signOut(); };
 
   const handleDeleteExpense = async (id: string) => {
     await supabase.from('expenses').delete().eq('id', id);
@@ -149,31 +146,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 pb-20">
-      {/* CSS para o botão pulsar */}
-      <style>{`
-        @keyframes pulse-meta {
-          0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-          70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-        }
-        .animate-pulse-meta {
-          animation: pulse-meta 2s infinite;
-        }
-      `}</style>
-
       <header className="bg-white border-b p-6 sticky top-0 z-40 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Wallet className="text-primary" size={28} />
           <h1 className="text-xl font-black text-primary uppercase tracking-tighter">GastoControl</h1>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setIsGoalFormOpen(true)} 
-            className="hidden md:flex animate-pulse-meta border-secondary text-secondary hover:bg-secondary/10"
-          >
-            <Target size={18}/> Meta
-          </Button>
           <Button onClick={() => setIsFormOpen(true)}><Plus size={18}/> Gasto</Button>
           <Button variant="ghost" onClick={handleLogout} className="p-2 ml-2">
             <LogOut size={20} />
@@ -219,7 +197,10 @@ export default function App() {
               <div className="space-y-3">
                 {fixedExpenses.map(f => (
                   <div key={f.id} className="flex justify-between items-center text-sm border-b border-zinc-50 pb-2 group">
-                    <span className="text-zinc-500 font-medium">{f.description}</span>
+                    <div className="flex flex-col">
+                        <span className="text-zinc-500 font-medium">{f.description}</span>
+                        <span className="text-[10px] text-zinc-400 font-bold uppercase">{f.category}</span>
+                    </div>
                     <div className="flex items-center gap-3">
                       <span className="font-bold">{formatCurrency(f.amount)}</span>
                       <button onClick={() => handleDeleteFixed(f.id)} className="text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
@@ -243,6 +224,7 @@ export default function App() {
                     <tr className="text-left text-[10px] font-bold text-zinc-400 uppercase border-b">
                       <th className="pb-4">Data</th>
                       <th className="pb-4">Descrição</th>
+                      <th className="pb-4">Categoria</th>
                       <th className="pb-4 text-right">Valor</th>
                       <th className="pb-4 w-10"></th>
                     </tr>
@@ -252,6 +234,7 @@ export default function App() {
                       <tr key={e.id} className="group hover:bg-zinc-50">
                         <td className="py-4 text-sm">{format(parseISO(e.date), 'dd/MM')}</td>
                         <td className="py-4 font-bold">{e.description}</td>
+                        <td className="py-4 text-[10px] font-bold text-zinc-400 uppercase">{e.category}</td>
                         <td className="py-4 text-right font-black text-primary">{formatCurrency(e.amount)}</td>
                         <td className="py-4 text-right">
                           <button onClick={() => handleDeleteExpense(e.id)} className="text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
@@ -268,19 +251,25 @@ export default function App() {
         </div>
 
         <section className="space-y-6 pt-6">
-          <div className="flex items-center gap-2 border-l-4 border-secondary pl-4">
-            <Target size={28} className="text-secondary" />
-            <h3 className="font-black text-2xl text-primary uppercase">Minhas Metas</h3>
+          <div className="flex items-center gap-4 border-l-4 border-secondary pl-4">
+            <div className="flex items-center gap-2">
+               <Target size={28} className="text-secondary" />
+               <h3 className="font-black text-2xl text-primary uppercase">Minhas Metas</h3>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsGoalFormOpen(true)} 
+              className="text-xs border-secondary text-secondary hover:bg-secondary/10"
+            >
+              <Plus size={14}/> Metas
+            </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {goals.map(goal => {
               const progress = (goal.current_amount / (goal.target_amount || 1)) * 100;
               return (
                 <Card key={goal.id} className="p-6 border-b-4 border-secondary relative group">
-                  <button 
-                    onClick={() => handleDeleteGoal(goal.id)} 
-                    className="absolute top-4 right-4 text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1"
-                  >
+                  <button onClick={() => handleDeleteGoal(goal.id)} className="absolute top-4 right-4 text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1">
                     <Trash2 size={18} />
                   </button>
                   <div className="flex justify-between mb-4">
@@ -308,20 +297,56 @@ export default function App() {
             <form onSubmit={handleAddExpense} className="space-y-4">
               <input type="text" placeholder="O que você comprou?" className="w-full p-4 bg-zinc-50 border-none rounded-2xl" required value={newExpense.description} onChange={e => setNewExpense({...newExpense, description: e.target.value})} />
               <input type="text" placeholder="Valor R$" className="w-full p-4 bg-zinc-50 border-none rounded-2xl" required value={newExpense.amount} onChange={e => setNewExpense({...newExpense, amount: e.target.value})} />
+              
+              <select className="w-full p-4 bg-zinc-50 border-none rounded-2xl" value={newExpense.category} onChange={e => setNewExpense({...newExpense, category: e.target.value as Category})}>
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+
               <input type="date" className="w-full p-4 bg-zinc-50 border-none rounded-2xl" required value={newExpense.date} onChange={e => setNewExpense({...newExpense, date: e.target.value})} />
               <Button type="submit" className="w-full py-4 uppercase font-black">Salvar Gasto</Button>
             </form>
           </Modal>
         )}
+        
         {isFixedFormOpen && (
           <Modal title="Nova Despesa Mensal" onClose={() => setIsFixedFormOpen(false)}>
             <form onSubmit={handleAddFixed} className="space-y-4">
-              <input type="text" placeholder="Ex: Aluguel, Internet..." className="w-full p-4 bg-zinc-50 border-none rounded-2xl" required value={newFixed.description} onChange={e => setNewFixed({...newFixed, description: e.target.value})} />
-              <input type="text" placeholder="Valor Fixo R$" className="w-full p-4 bg-zinc-50 border-none rounded-2xl" required value={newFixed.amount} onChange={e => setNewFixed({...newFixed, amount: e.target.value})} />
-              <Button type="submit" variant="secondary" className="w-full py-4 uppercase font-black">Salvar Conta Fixa</Button>
+              {/* SELEÇÃO DA CONTA - Define descrição e categoria automaticamente */}
+              <select 
+                className="w-full p-4 bg-zinc-50 border-none rounded-2xl" 
+                required 
+                value={newFixed.description} 
+                onChange={e => setNewFixed({...newFixed, description: e.target.value, category: 'Moradia'})}
+              >
+                <option value="">Selecione a conta...</option>
+                <option value="Aluguel">Aluguel</option>
+                <option value="Energia">Energia</option>
+                <option value="Água">Água</option>
+                <option value="Internet">Internet</option>
+                <option value="Mercado">Mercado</option>
+                <option value="Academia">Academia</option>
+                <option value="Streaming">Streaming</option>
+                <option value="Outros">Outros</option>
+              </select>
+              
+              <input 
+                type="text" 
+                placeholder="Valor Fixo R$" 
+                className="w-full p-4 bg-zinc-50 border-none rounded-2xl" 
+                required 
+                value={newFixed.amount} 
+                onChange={e => setNewFixed({...newFixed, amount: e.target.value})} 
+              />
+
+              <Button type="submit" variant="secondary" className="w-full py-4 uppercase font-black">
+                Salvar Conta Fixa
+              </Button>
             </form>
           </Modal>
         )}
+
         {isSalaryFormOpen && (
           <Modal title="Atualizar Salário" onClose={() => setIsSalaryFormOpen(false)}>
             <form onSubmit={handleUpdateSalary} className="space-y-4">
@@ -345,7 +370,6 @@ export default function App() {
   );
 }
 
-// --- TELA DE LOGIN ESTILIZADA ---
 function Login() {
   const handleLogin = () => supabase.auth.signInWithOAuth({ provider: 'google' });
   return (

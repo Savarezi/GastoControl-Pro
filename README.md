@@ -140,8 +140,7 @@ Este repositório contém a lógica e a estrutura de banco de dados do **GastoCo
 
 O diagrama abaixo representa a estrutura de Entidade-Relacionamento do sistema. Ele foi desenhado seguindo uma estética moderna para facilitar a visualização das conexões entre as tabelas.
 
-![GastoControl](https://github.com/user-attachments/assets/ed1b3ad8-38be-4f7e-a0f4-04d03610fe9d)
-
+<img src="https://github.com/user-attachments/assets/24755bd9-5045-4628-b63c-4033e2a8cc60" width="450" align="center" style="display: block; margin: 0 auto;">
 
 ### 📑 Glossário das Tabelas
 

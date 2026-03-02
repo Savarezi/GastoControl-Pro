@@ -102,6 +102,11 @@ export default function App() {
     fetchData();
   };
 
+  const handleUpdateGoalStatus = async (id: string, newStatus: string) => {
+    await supabase.from('goals').update({ status: newStatus }).eq('id', id);
+    fetchData();
+  };
+
   const parseAmount = (val: string) => parseFloat(val.replace(',', '.'));
 
   const handleAddExpense = async (e: React.FormEvent) => {
@@ -120,7 +125,14 @@ export default function App() {
 
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from('goals').insert([{ title: newGoal.title, target_amount: parseAmount(newGoal.target_amount), deadline: newGoal.deadline, user_id: session?.user.id, current_amount: 0 }]);
+    const { error } = await supabase.from('goals').insert([{ 
+      title: newGoal.title, 
+      target_amount: parseAmount(newGoal.target_amount), 
+      deadline: newGoal.deadline, 
+      user_id: session?.user.id, 
+      current_amount: 0,
+      status: 'Não iniciada'
+    }]);
     if (!error) { setIsGoalFormOpen(false); setNewGoal({ title: '', target_amount: '', deadline: '' }); fetchData(); }
   };
 
@@ -250,6 +262,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* SEÇÃO DE METAS ATUALIZADA - LIMPA E FUNCIONAL */}
         <section className="space-y-6 pt-6">
           <div className="flex items-center gap-4 border-l-4 border-secondary pl-4">
             <div className="flex items-center gap-2">
@@ -261,32 +274,63 @@ export default function App() {
               onClick={() => setIsGoalFormOpen(true)} 
               className="text-xs border-secondary text-secondary hover:bg-secondary/10"
             >
-              <Plus size={14}/> Metas
+              <Plus size={14}/> Nova Meta
             </Button>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {goals.map(goal => {
-              const progress = (goal.current_amount / (goal.target_amount || 1)) * 100;
-              return (
-                <Card key={goal.id} className="p-6 border-b-4 border-secondary relative group">
-                  <button onClick={() => handleDeleteGoal(goal.id)} className="absolute top-4 right-4 text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1">
-                    <Trash2 size={18} />
-                  </button>
-                  <div className="flex justify-between mb-4">
-                    <Flag size={20} className="text-secondary"/>
-                    <span className="text-[10px] font-black text-zinc-400 uppercase">
-                      {goal.deadline ? format(parseISO(goal.deadline), 'MMM yyyy', {locale: ptBR}) : 'S/ Data'}
+            {goals.map(goal => (
+              <Card key={goal.id} className={cn(
+                "p-6 border-b-8 relative group transition-all duration-300",
+                goal.status === 'Concluída' ? "border-emerald-500 shadow-lg shadow-emerald-100/20" : 
+                goal.status === 'Em andamento' ? "border-yellow-400 shadow-lg shadow-yellow-100/20" : 
+                "border-zinc-200"
+              )}>
+                <button onClick={() => handleDeleteGoal(goal.id)} className="absolute top-4 right-4 text-zinc-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1">
+                  <Trash2 size={18} />
+                </button>
+
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1">
+                      {goal.deadline ? format(parseISO(goal.deadline), 'MMMM yyyy', {locale: ptBR}) : 'Sem prazo'}
                     </span>
+                    <h4 className="font-black text-primary text-xl">
+                      {goal.title} {goal.status === 'Concluída' && '✨'}
+                    </h4>
                   </div>
-                  <h4 className="font-black text-primary text-xl">{goal.title}</h4>
-                  <p className="text-xs text-zinc-400 mb-4 uppercase">Meta: {formatCurrency(goal.target_amount)}</p>
-                  <div className="h-2 bg-zinc-100 rounded-full overflow-hidden mb-2">
-                    <div className="h-full bg-secondary" style={{ width: `${progress}%` }} />
+                  <Flag size={20} className={cn(
+                    goal.status === 'Concluída' ? "text-emerald-500" : 
+                    goal.status === 'Em andamento' ? "text-yellow-500" : "text-zinc-300"
+                  )}/>
+                </div>
+                
+                {/* BOLINHAS DE STATUS */}
+                <div className="flex items-center gap-3 pt-4 border-t border-zinc-50 mt-4">
+                  <div className="flex gap-2">
+                    {[
+                      { label: 'Não iniciada', color: 'bg-zinc-200' },
+                      { label: 'Em andamento', color: 'bg-yellow-400' },
+                      { label: 'Concluída', color: 'bg-emerald-500' }
+                    ].map((s) => (
+                      <button
+                        key={s.label}
+                        onClick={() => handleUpdateGoalStatus(goal.id, s.label)}
+                        className={cn(
+                          "w-5 h-5 rounded-full border-2 transition-all hover:scale-110",
+                          goal.status === s.label ? "border-zinc-800 scale-110" : "border-transparent opacity-30 hover:opacity-100",
+                          s.color
+                        )}
+                        title={s.label}
+                      />
+                    ))}
                   </div>
-                  <div className="text-[10px] font-black text-secondary">{progress.toFixed(0)}% CONCLUÍDO</div>
-                </Card>
-              );
-            })}
+                  <span className="text-[9px] font-bold text-zinc-400 uppercase">
+                    {goal.status}
+                  </span>
+                </div>
+              </Card>
+            ))}
           </div>
         </section>
       </main>
@@ -313,7 +357,6 @@ export default function App() {
         {isFixedFormOpen && (
           <Modal title="Nova Despesa Mensal" onClose={() => setIsFixedFormOpen(false)}>
             <form onSubmit={handleAddFixed} className="space-y-4">
-              {/* SELEÇÃO DA CONTA - Define descrição e categoria automaticamente */}
               <select 
                 className="w-full p-4 bg-zinc-50 border-none rounded-2xl" 
                 required 
@@ -355,6 +398,7 @@ export default function App() {
             </form>
           </Modal>
         )}
+
         {isGoalFormOpen && (
           <Modal title="Novo Sonho" onClose={() => setIsGoalFormOpen(false)}>
             <form onSubmit={handleAddGoal} className="space-y-4">

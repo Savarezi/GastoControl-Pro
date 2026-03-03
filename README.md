@@ -186,10 +186,7 @@ Para manter a clareza técnica, utilizamos a seguinte convenção visual no **dr
 * **Relacionamento 1:N:** As linhas neon indicam que **um** usuário pode possuir **múltiplos** registros em todas as outras tabelas.
 * **Tema Dark:** Fundo escuro com alto contraste para facilitar a leitura de desenvolvedores.
 
-## 🌐 Deploy
-
-A aplicação pode ser publicada facilmente na Vercel.
-
+## 🌐 Para rodar install npm 
 ```bash
 npm install
 npm run dev

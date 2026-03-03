@@ -107,7 +107,11 @@ export default function App() {
     fetchData();
   };
 
-  const parseAmount = (val: string) => parseFloat(val.replace(',', '.'));
+  const parseAmount = (val: string) => {
+    if (!val) return 0;
+    const cleanVal = val.toString().replace(/\./g, '').replace(',', '.');
+    return parseFloat(cleanVal) || 0;
+  };
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,17 +127,31 @@ export default function App() {
     if (!error) { setIsFixedFormOpen(false); setNewFixed({ description: '', amount: '', category: 'Moradia' }); fetchData(); }
   };
 
+  // FUNÇÃO DE METAS AJUSTADA PARA O SEU SQL, PATRICIA
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from('goals').insert([{ 
+    const amount = parseAmount(newGoal.target_amount);
+    
+    // Deixando o banco usar o DEFAULT 'Não iniciada' que você definiu no SQL
+    const goalData = { 
       title: newGoal.title, 
-      target_amount: parseAmount(newGoal.target_amount), 
-      deadline: newGoal.deadline, 
+      target_amount: amount, 
+      deadline: newGoal.deadline || null, 
       user_id: session?.user.id, 
-      current_amount: 0,
-      status: 'Não iniciada'
-    }]);
-    if (!error) { setIsGoalFormOpen(false); setNewGoal({ title: '', target_amount: '', deadline: '' }); fetchData(); }
+      current_amount: 0
+      // Removi a linha do status para o banco usar o padrão dele sozinho
+    };
+
+    const { error } = await supabase.from('goals').insert([goalData]);
+    
+    if (error) {
+      console.error("Erro ao criar meta:", error.message);
+      alert("Erro ao criar meta: " + error.message);
+    } else { 
+      setIsGoalFormOpen(false); 
+      setNewGoal({ title: '', target_amount: '', deadline: '' }); 
+      fetchData(); 
+    }
   };
 
   const handleUpdateSalary = async (e: React.FormEvent) => {
@@ -262,7 +280,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* SEÇÃO DE METAS ATUALIZADA - LIMPA E FUNCIONAL */}
         <section className="space-y-6 pt-6">
           <div className="flex items-center gap-4 border-l-4 border-secondary pl-4">
             <div className="flex items-center gap-2">
@@ -305,7 +322,6 @@ export default function App() {
                   )}/>
                 </div>
                 
-                {/* BOLINHAS DE STATUS */}
                 <div className="flex items-center gap-3 pt-4 border-t border-zinc-50 mt-4">
                   <div className="flex gap-2">
                     {[

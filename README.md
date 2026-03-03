@@ -192,4 +192,4 @@ A aplicação pode ser publicada facilmente na Vercel.
 
 ```bash
 npm install
-npm run build
+npm run dev

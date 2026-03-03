@@ -130,11 +130,6 @@ Fluxo simplificado:
 Usuário → Interface React → Serviços (Supabase) → Banco de Dados → Atualização em tempo real na UI
 
 ---
-# 🏦 GastoControl - Arquitetura de Dados
-
-Este repositório contém a lógica e a estrutura de banco de dados do **GastoControl**, um sistema inteligente de gestão financeira pessoal.
-
----
 
 ## 🏗️ Modelagem de Dados (DER)
 

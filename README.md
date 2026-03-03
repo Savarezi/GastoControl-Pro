@@ -140,6 +140,16 @@ Este repositório contém a lógica e a estrutura de banco de dados do **GastoCo
 
 O diagrama abaixo representa a estrutura de Entidade-Relacionamento do sistema. Ele foi desenhado seguindo uma estética moderna para facilitar a visualização das conexões entre as tabelas.
 
+## 🎨 Padrão Visual do Diagrama
+
+Para manter a clareza técnica, utilizamos a seguinte convenção visual no **draw.io**:
+
+* **PK (Primary Key):** Destacadas em **Amarelo**, representam a identidade única de cada registro.
+* **FK (Foreign Key):** Destacadas em **Azul**, representam os pontos de união (relacionamentos) entre as tabelas.
+* **Relacionamento 1:N:** As linhas neon indicam que **um** usuário pode possuir **múltiplos** registros em todas as outras tabelas.
+* **Tema Dark:** Fundo escuro com alto contraste para facilitar a leitura de desenvolvedores.
+
+
 <img src="https://github.com/user-attachments/assets/24755bd9-5045-4628-b63c-4033e2a8cc60" width="450" align="center" style="display: block; margin: 0 auto;">
 
 ### 📑 Glossário das Tabelas
@@ -176,15 +186,6 @@ Tabela focada em objetivos de médio e longo prazo.
 * **status:** Estado atual (Não iniciada, Em andamento ou Concluída).
 
 ---
-
-## 🎨 Padrão Visual do Diagrama
-
-Para manter a clareza técnica, utilizamos a seguinte convenção visual no **draw.io**:
-
-* **PK (Primary Key):** Destacadas em **Amarelo**, representam a identidade única de cada registro.
-* **FK (Foreign Key):** Destacadas em **Azul**, representam os pontos de união (relacionamentos) entre as tabelas.
-* **Relacionamento 1:N:** As linhas neon indicam que **um** usuário pode possuir **múltiplos** registros em todas as outras tabelas.
-* **Tema Dark:** Fundo escuro com alto contraste para facilitar a leitura de desenvolvedores.
 
 ## 🌐 Para rodar install npm 
 ```bash
